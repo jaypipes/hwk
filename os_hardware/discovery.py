@@ -16,19 +16,19 @@ import os
 import sys
 
 
-def get_supported_pagesizes():
+def supported_memory_page_sizes():
+    """Returns a set() containing the memory page sizes, in KB, supported by
+    the host, or None if the page sizes could not be determined.
+    """
     try:
         return {
-            "linux2": _linux_get_supported_pagesizes,
+            "linux2": _linux_supported_memory_page_sizes,
         }[sys.platform]()
     except KeyError:
         return None
 
 
-def _linux_get_supported_pagesizes():
-    """Returns a set() containing the memory page sizes, in KB, supported by
-    the host.
-    """
+def _linux_supported_memory_page_sizes():
     # In Linux, /sys/kernel/mm/hugepages contains a directory per page size
     # supported by the kernel. The directory name corresponds to the pattern
     # 'hugepages-{pagesize}kb'
