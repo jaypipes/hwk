@@ -6,13 +6,15 @@
 
 ### Discovery
 
-You can use the functions in `os_hardware.discovery` to determine various
+You can use the functions in `os_hardware` to determine various
 hardware-related information about the host computer.
 
+#### Memory
+
 ```bash
->>> from os_hardware import discovery
+>>> from os_hardware import memory
 >>> 
->>> discovery.get_supported_memory_page_sizes()
+>>> memory.supported_page_sizes()
 set([2048, 1048576])
 ```
 

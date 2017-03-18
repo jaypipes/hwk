@@ -14,24 +14,23 @@
 
 import mock
 
-from os_hardware import discovery
+from os_hardware import memory
 
 from os_hardware.tests.unit import base
 
 
-class TestDiscovery(base.TestCase):
-    """Test case base class for all unit tests."""
+class TestMemory(base.TestCase):
 
     @mock.patch('os.path.isdir', return_value=True)
     @mock.patch('os.listdir')
     @mock.patch('sys.platform', 'linux2')
-    def test_supported_memory_page_sizes_linux(self, listdir_mock,
+    def test_supported_page_sizes_linux(self, listdir_mock,
             is_dir_mock):
         listdir_mock.return_value = [
             'hugepages-2048kb',
             'hugepages-1048576kb',
         ]
-        page_sizes = discovery.supported_memory_page_sizes()
+        page_sizes = memory.supported_page_sizes()
 
         expected = set([2048, 1048576])
         self.assertEqual(expected, page_sizes)
