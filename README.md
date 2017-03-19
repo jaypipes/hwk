@@ -14,6 +14,8 @@ hardware-related information about the host computer.
 ```bash
 >>> from os_hardware import memory
 >>> 
+>>> memory.info()
+memory (24565.0 MB physical, 24099.0 MB usable)
 >>> memory.supported_page_sizes()
 set([2048, 1048576])
 ```
