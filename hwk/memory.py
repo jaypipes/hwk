@@ -21,6 +21,25 @@ import sys
 from hwk import utils
 
 
+_INFO_HELP = """Memory subsystem
+===============================================================================
+`hwk.memory.Info` attributes:
+
+total_physical_bytes (int)
+
+  Number of bytes of physical RAM available to the system
+
+total_usable_bytes (int)
+
+  Number of bytes usable by the system (physical bytes minus a few bits
+  reserved for system and the resident kernel size)
+
+supported_page_sizes (set of int)
+
+  A set of ints indicating memory page sizes the system can utilize, in bytes
+"""
+
+
 class Info(object):
     """Object describing the memory information about a system."""
 
@@ -40,6 +59,11 @@ class Info(object):
             tub = math.floor(self.total_usable_bytes / (1024 * 1024))
             tub = str(tub) + ' MB'
         return "memory (%s physical, %s usable)" % (tpb, tub)
+
+    def describe(self):
+        return _INFO_HELP
+
+
 
 
 def supported_page_sizes():

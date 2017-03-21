@@ -25,11 +25,34 @@ to get information about the memory subsystem, you would use the
 object that describes the disk subsystem of the host.
 
 The objects returned by the `info()` functions all have a `describe()` method
-that prints out helpful descriptions of the attributes of the object.
+that prints out helpful descriptions of the attributes of the object. For
+example, from the `hwk.memory` module:
+
+```
+>>> from hwk import memory
+>>> i = memory.info()
+>>> print i.describe()
+Memory subsystem
+===============================================================================
+`hwk.memory.Info` attributes:
+
+total_physical_bytes (int)
+
+  Number of bytes of physical RAM available to the system
+
+total_usable_bytes (int)
+
+  Number of bytes usable by the system (physical bytes minus a few bits
+  reserved for system and the resident kernel size)
+
+supported_page_sizes (set of int)
+
+  A set of ints indicating memory page sizes the system can utilize, in bytes
+```
 
 #### Memory
 
-```bash
+```
 >>> from hwk import memory
 >>> 
 >>> memory.info()
