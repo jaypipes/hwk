@@ -44,9 +44,8 @@ class Info(object):
     """Object describing the memory information about a system."""
 
     def __init__(self):
-        self.total_usable_bytes = None
         self.total_physical_bytes = None
-        self.total_reserved_bytes = None
+        self.total_usable_bytes = None
         self.supported_page_sizes = None
 
     def __repr__(self):
@@ -62,8 +61,6 @@ class Info(object):
 
     def describe(self):
         return _INFO_HELP
-
-
 
 
 def supported_page_sizes():

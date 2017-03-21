@@ -5,11 +5,15 @@ tools.
 
 ## Design Principles
 
-### No root privileges needed
+### No root privileges needed for discovery
 
 `hwk` goes the extra mile to be useful without root priveleges. We query for
 host hardware information as directly as possible without relying on shellouts
 to programs like `dmidecode` that require root privileges to execute.
+
+Of course, manipulating hardware often requires elevated privileges, and that
+is fine. However, when querying for device and host hardware information, we
+will not use any method that requires elevating to root/superuser.
 
 ## Usage
 
@@ -59,6 +63,18 @@ supported_page_sizes (set of int)
 memory (24565.0 MB physical, 24099.0 MB usable)
 >>> memory.supported_page_sizes()
 set([2048, 1048576])
+```
+
+#### Disks
+
+```
+>>> from hwk import disk
+>>> disk.info()
+disk (1 disks, 1905440.0 MB total size)
+>>> for d in disk.info().disks:
+...     print d
+... 
+sda (1905440 MB) [SCSI]
 ```
 
 ## Developers
