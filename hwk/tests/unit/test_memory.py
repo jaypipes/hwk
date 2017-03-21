@@ -14,9 +14,9 @@
 
 import mock
 
-from os_hardware import memory
+from hwk import memory
 
-from os_hardware.tests.unit import base
+from hwk.tests.unit import base
 
 
 class TestMemory(base.TestCase):

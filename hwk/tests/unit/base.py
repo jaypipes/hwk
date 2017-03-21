@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from os_hardware.tests import base
+from hwk.tests import base
 
 
 class TestCase(base.TestCase):

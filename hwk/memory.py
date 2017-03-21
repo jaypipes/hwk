@@ -18,7 +18,7 @@ import os
 import re
 import sys
 
-from os_hardware import utils
+from hwk import utils
 
 
 class Info(object):
