@@ -25,8 +25,8 @@ hardware-related information about the host computer.
 Each module in `hwk` contains a single `info()` function that returns an object
 containing information about a particular subsystem or component. For example,
 to get information about the memory subsystem, you would use the
-`hwk.memory.info()` function. The `hwk.disk.info()` method likewise returns an
-object that describes the disk subsystem of the host.
+`hwk.memory.info()` function. The `hwk.block.info()` method likewise returns an
+object that describes the block devices of the host.
 
 The objects returned by the `info()` functions all have a `describe()` method
 that prints out helpful descriptions of the attributes of the object. For
@@ -65,16 +65,13 @@ memory (24565.0 MB physical, 24099.0 MB usable)
 set([2048, 1048576])
 ```
 
-#### Disks
+#### Block devices
 
 ```
->>> from hwk import disk
->>> disk.info()
-disk (1 disks, 1905440.0 MB total size)
->>> for d in disk.info().disks:
-...     print d
-... 
-sda (1905440 MB) [SCSI]
+>>> from hwk import block
+>>> block.info()
+block (1 block devices, 1905440.0 MB total size)
+```
 ```
 
 ## Developers
