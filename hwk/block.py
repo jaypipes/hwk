@@ -16,12 +16,14 @@ import math
 import os
 import sys
 
+from hwk import udev
 from hwk import units
 from hwk import utils
 
 
 _SECTOR_SIZE = 512
-_LINUX_SYS_BLOCK_DIR = '/sys/block'
+_LINUX_SYS_BLOCK_DIR = '/sys/block/'
+_LINUX_SYS_CLASS_BLOCK_DIR = '/sys/class/block/'
 _INFO_HELP = """Block device subsystem
 ===============================================================================
 `hwk.block.Info` attributes:
@@ -47,6 +49,14 @@ devices (list of `hwk.block.Device` objects)
   bus_type (string)
 
     'IDE' or 'SCSI'
+
+  vendor (string)
+
+    Device vendor, if known
+
+  serial_no (string)
+
+    Serial number of the device, if known
 """
 
 
@@ -71,16 +81,27 @@ class Info(object):
 class Device(object):
     """Object describing a block device."""
 
-    def __init__(self, name, size_bytes=None, bus_type=None):
+    def __init__(self, name, size_bytes=None, bus_type=None, vendor=None,
+            serial_no=None):
         self.name = name
         self.size_bytes = size_bytes
         self.bus_type = bus_type
+        self.vendor = vendor
+        self.serial_no = serial_no
 
     def __repr__(self):
-        return "%s (%d MB) [%s]" % (
+        vendor_str = ''
+        if self.vendor is not None:
+            vendor_str = ' ' + self.vendor
+        serial_str = ''
+        if self.serial_no is not None:
+            serial_str = ' - SN #' + self.serial_no
+        return "/dev/%s (%d MB) [%s]%s%s" % (
             self.name,
             math.floor((self.size_bytes or 0) / units.MB),
             self.bus_type,
+            vendor_str,
+            serial_str,
         )
 
 
@@ -112,6 +133,10 @@ def _linux_devices():
         size_bytes = _linux_device_size_bytes(filename)
 
         d = Device(name=filename, bus_type=bus_type, size_bytes=size_bytes)
+        udev_path = _LINUX_SYS_CLASS_BLOCK_DIR + filename
+        d_info = udev.device_properties(udev_path)
+        d.vendor = d_info.get('ID_VENDOR')
+        d.serial_no = d_info.get('ID_SERIAL')
         res.append(d)
 
     return res

@@ -69,9 +69,11 @@ set([2048, 1048576])
 
 ```
 >>> from hwk import block
->>> block.info()
-block (1 block devices, 1905440.0 MB total size)
-```
+>>> i = block.info()
+>>> for d in i.devices:
+...     print d
+... 
+/dev/sda (1905440 MB) [SCSI] LSI - SN# 3600508e000000000f8253aac9a1abd0c
 ```
 
 ## Developers
