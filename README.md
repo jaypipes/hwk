@@ -70,11 +70,25 @@ set([2048, 1048576])
 ```
 >>> from hwk import block
 >>> i = block.info()
->>> for d in i.devices:
-...     print d
+>>> i
+block (1 disk block devices, 1905440.0 MB total size)
+>>> for d in i.disks:
+...     print "disk: " + str(d)
+...     for p in d.partitions:
+...             print "  partition: " + str(p)
 ... 
-/dev/sda (1905440 MB) [SCSI] LSI - SN# 3600508e000000000f8253aac9a1abd0c
+disk: /dev/sda (1905440 MB) [SCSI] LSI - SN #3600508e000000000f8253aac9a1abd0c
+  partition: /dev/sda6 (1699533 MB) [ext4] mounted@/ - f29a0c43-749b-4fea-b2bb-d120e896e702
+  partition: /dev/sda1 (100 MB) [ntfs] - E0A237E1A237BABC
+  partition: /dev/sda3 (449 MB) [ntfs] - 7026ADB926AD8128
+  partition: /dev/sda2 (190881 MB) [ntfs] - B00C39910C395416
+  partition: /dev/sda5 (14473 MB) [swap] - 7710167e-924b-4773-b1e6-906540d15b6d
+  partition: /dev/sda4 (0 MB) [None]
 ```
+
+#### Disks
+
+
 
 ## Developers
 
