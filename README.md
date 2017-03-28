@@ -86,9 +86,14 @@ disk: /dev/sda (1905440 MB) [SCSI] LSI - SN #3600508e000000000f8253aac9a1abd0c
   partition: /dev/sda4 (0 MB) [None]
 ```
 
-#### Disks
+#### CPU
 
-
+```
+>>> from hwk import cpu
+>>> 
+>>> cpu.info()
+cpu (6 cores, 12 threads)
+```
 
 ## Developers
 
