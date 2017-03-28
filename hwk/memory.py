@@ -140,7 +140,7 @@ def _linux_total_physical_bytes():
 
 
 def info():
-    """Returns a `MemoryInfo` object containing information on the memory
+    """Returns a `hwk.memory.Info` object containing information on the memory
     available to the system, or None if the information could not be
     determined.
     """
