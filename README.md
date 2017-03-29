@@ -90,9 +90,11 @@ disk: /dev/sda (1905440 MB) [SCSI] LSI - SN #3600508e000000000f8253aac9a1abd0c
 
 ```
 >>> from hwk import cpu
->>> 
->>> cpu.info()
-cpu (6 cores, 12 threads)
+>>> i = cpu.info()
+>>> for c in i.cpus:
+...     print c
+... 
+processor 0 (6 cores, 12 threads)[Intel(R) Core(TM) i7 CPU         980  @ 3.33GHz]
 ```
 
 ## Developers

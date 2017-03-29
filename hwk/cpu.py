@@ -30,6 +30,32 @@ total_cores (int)
 total_threads (int)
 
   Number of physical CPU threads
+
+cpus (list of `hwk.cpu.CPU` objects)
+
+  A list of objects describing the physical CPUs
+
+  `hwk.cpu.CPU` attributes:
+
+  id (int)
+
+    0-based index of the processor, according to the system
+
+  cores (int)
+
+    Number of physical cores on the CPU
+
+  threads (int)
+
+    Number of hardware threads on the CPU
+
+  model (string)
+
+    String describing the processor model, if known
+
+  vendor (string)
+
+    The processor vendor, if known
 """
 
 
@@ -48,6 +74,33 @@ class Info(object):
 
     def describe(self):
         return _INFO_HELP
+
+
+class CPU(object):
+
+    def __init__(self, proc_id):
+        self.cores = None
+        self.threads = None
+        self.model = None
+        self.vendor = None
+        self.id = int(proc_id)
+
+    def __repr__(self):
+        cores_str = 'unknown #'
+        if self.cores is not None:
+            cores_str = str(self.cores)
+        threads_str = 'unknown #'
+        if self.threads is not None:
+            threads_str = str(self.threads)
+        model_str = ''
+        if self.model is not None:
+            model_str = '[' + self.model.strip() + ']'
+        return "processor %d (%s cores, %s threads)%s" % (
+            self.id,
+            cores_str,
+            threads_str,
+            model_str,
+        )
 
 
 def total_cores():
@@ -99,20 +152,33 @@ def info():
 
 @utils.memoize
 def _linux_info():
-    cores = 0
-    threads = 0
     cpu_info = open('/proc/cpuinfo', 'rb').readlines()
+    cpu_attrs = []
+    cur_cpu_attrs = {}
     for line in cpu_info:
         if line.strip() == '':
+            cpu_attrs.append(cur_cpu_attrs)
+            cur_cpu_attrs = {}
             continue
         key, value = line.split(':')
         key = key.strip()
-        if key == 'cpu cores':
-            cores = int(value.strip())
-        if key == 'siblings':
-            threads = int(value.strip())
+        cur_cpu_attrs[key] = value
+
+    # Group all processor attrs by physical id, which signifies physical CPU
+    cpu_ids = set(c['physical id'] for c in cpu_attrs)
+    cpus = []
+    for cpu_id in cpu_ids:
+        cpu = CPU(cpu_id)
+        procs_in_cpu = [c for c in cpu_attrs if c['physical id'] == cpu_id]
+        first = procs_in_cpu[0]
+        cpu.model = first['model name']
+        cpu.vendor = first['vendor_id']
+        cpu.cores = int(first['cpu cores'])
+        cpu.threads = int(first['siblings'])
+        cpus.append(cpu)
 
     res = Info()
-    res.total_cores = cores
-    res.total_threads = threads
+    res.total_cores = sum(c.cores for c in cpus)
+    res.total_threads = sum(c.threads for c in cpus)
+    res.cpus = cpus
     return res
