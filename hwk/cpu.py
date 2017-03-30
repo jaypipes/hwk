@@ -82,9 +82,11 @@ class Info(object):
     def __init__(self):
         self.total_cores = None
         self.total_threads = None
+        self.cpus = []
 
     def __repr__(self):
-        return "cpu (%s cores, %s threads)" % (
+        return "cpu (%d physical packages, %s cores, %s hardware threads)" % (
+            len(self.cpus),
             self.total_cores,
             self.total_threads,
         )
@@ -198,8 +200,8 @@ def _linux_info():
         # finding the zero-based index of the core within the physical
         # package/socket. Turns out that certain vendors return a "core id"
         # value that doesn't align with a zero-based sequential array (looking
-        # at you, Intel i7., which returns the core ids {0, 1, 2, 8, 9, 10} for
-        # its six cores. So, here we create a map of the core id returned by
+        # at you, Intel i7, which returns the core ids {0, 1, 2, 8, 9, 10} for
+        # its six cores). So, here we create a map of the core id returned by
         # /proc/cpuinfo to the zero-based index of the core within the physical
         # socket. We determine the zero-based index by examining the processor
         # #s associated with the cores, order them and tie the ordered list
