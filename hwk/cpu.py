@@ -56,6 +56,23 @@ cpus (list of `hwk.cpu.CPU` objects)
   vendor (string)
 
     The processor vendor, if known
+
+  processor_map (dict)
+
+    A mapping of each of this CPU's cores to a set of system processor IDs.
+
+    For example, assume a system has 2 CPUs, each with 4 cores and each core
+    has 2 hardware threads. The total number of processors in the system would
+    equal 2 x 4 x 2 = 16. Now, let's also assume that the system sees the
+    processors 4-7 and 12-15 belonging to the cores on the second CPU, the
+    processor_map might look like the following:
+    
+        {
+            0: set([4, 5]),
+            1: set([6, 7]),
+            2: set([12, 13]),
+            3: set([14, 15]),
+        }
 """
 
 
@@ -175,6 +192,32 @@ def _linux_info():
         cpu.vendor = first['vendor_id']
         cpu.cores = int(first['cpu cores'])
         cpu.threads = int(first['siblings'])
+        core_ids = set(c['core id'] for c in procs_in_cpu)
+        
+        # OK, so this looks exceedingly weird, but what we're doing here is
+        # finding the zero-based index of the core within the physical
+        # package/socket. Turns out that certain vendors return a "core id"
+        # value that doesn't align with a zero-based sequential array (looking
+        # at you, Intel i7., which returns the core ids {0, 1, 2, 8, 9, 10} for
+        # its six cores. So, here we create a map of the core id returned by
+        # /proc/cpuinfo to the zero-based index of the core within the physical
+        # socket. We determine the zero-based index by examining the processor
+        # #s associated with the cores, order them and tie the ordered list
+        # index back to the core id.
+        ordered_core_ids = [
+            c['core id'] for c in procs_in_cpu
+        ]
+        core_id_index = {
+            core_id: ordered_core_ids.index(core_id)
+            for core_id in core_ids
+        }
+        pmap = {
+            core_id_index[core_id]: set(
+                int(c['processor']) for c in procs_in_cpu
+                if c['core id'] == core_id
+            ) for core_id in core_ids
+        }
+        cpu.processor_map = pmap
         cpus.append(cpu)
 
     res = Info()

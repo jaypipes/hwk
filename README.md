@@ -89,12 +89,21 @@ disk: /dev/sda (1905440 MB) [SCSI] LSI - SN #3600508e000000000f8253aac9a1abd0c
 #### CPU
 
 ```
+>>> import pprint
 >>> from hwk import cpu
 >>> i = cpu.info()
 >>> for c in i.cpus:
 ...     print c
 ... 
 processor 0 (6 cores, 12 threads)[Intel(R) Core(TM) i7 CPU         980  @ 3.33GHz]
+>>> pmap = i.cpus[0].processor_map
+>>> pprint.pprint(pmap)
+{0: set([0, 6]),
+ 1: set([1, 7]),
+ 2: set([2, 8]),
+ 3: set([3, 9]),
+ 4: set([4, 10]),
+ 5: set([5, 11])}
 ```
 
 ## Developers
