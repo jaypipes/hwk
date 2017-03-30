@@ -73,6 +73,11 @@ cpus (list of `hwk.cpu.CPU` objects)
             2: set([12, 13]),
             3: set([14, 15]),
         }
+
+  features (set of strings)
+
+    A set of strings listing features of the CPU. This set of strings will be
+    highly dependent on the vendor of the processor.
 """
 
 
@@ -103,6 +108,8 @@ class CPU(object):
         self.model = None
         self.vendor = None
         self.id = int(proc_id)
+        self.features = set()
+        self.processor_map = {}
 
     def __repr__(self):
         cores_str = 'unknown #'
@@ -114,7 +121,7 @@ class CPU(object):
         model_str = ''
         if self.model is not None:
             model_str = '[' + self.model.strip() + ']'
-        return "processor %d (%s cores, %s threads)%s" % (
+        return "CPU %d (%s cores, %s threads)%s" % (
             self.id,
             cores_str,
             threads_str,
@@ -194,6 +201,10 @@ def _linux_info():
         cpu.vendor = first['vendor_id']
         cpu.cores = int(first['cpu cores'])
         cpu.threads = int(first['siblings'])
+        cpu.features = set(
+            s.strip() for s in first['flags'].split(' ')
+            if len(s.strip()) > 0
+        )
         core_ids = set(c['core id'] for c in procs_in_cpu)
         
         # OK, so this looks exceedingly weird, but what we're doing here is

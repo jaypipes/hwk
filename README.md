@@ -109,7 +109,7 @@ cpu (1 physical packages, 6 cores, 12 hardware threads)
 >>> for c in i.cpus:
 ...     print c
 ... 
-processor 0 (6 cores, 12 threads)[Intel(R) Core(TM) i7 CPU         980  @ 3.33GHz]
+CPU 0 (6 cores, 12 threads)[Intel(R) Core(TM) i7 CPU         980  @ 3.33GHz]
 >>> pmap = i.cpus[0].processor_map
 >>> pprint.pprint(pmap)
 {0: set([0, 6]),
@@ -118,6 +118,20 @@ processor 0 (6 cores, 12 threads)[Intel(R) Core(TM) i7 CPU         980  @ 3.33GH
  3: set([3, 9]),
  4: set([4, 10]),
  5: set([5, 11])}
+>>> features = i.cpus[0].features
+>>> pprint.pprint(features)
+set(['acpi',
+     'aes',
+     'aperfmperf',
+     'apic',
+     'arat',
+     < ... >
+     'vme',
+     'vmx',
+     'vnmi',
+     'vpid',
+     'xtopology',
+     'xtpr'])
 ```
 
 ## Developers
