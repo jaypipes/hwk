@@ -15,6 +15,18 @@ Of course, manipulating hardware often requires elevated privileges, and that
 is fine. However, when querying for device and host hardware information, we
 will not use any method that requires elevating to root/superuser.
 
+### Well-documented code and inline help
+
+The code itself should be well-documented, of course, but the objects that the
+library exposes should themselves be self-describing. See below for the
+`describe()` methods that the Info objects all implement.
+
+### Interfaces should be consistent across modules
+
+Each module in the library is structured in a consistent fashion, and the
+objects returned by various module functions should have consistent attribute
+and method names.
+
 ## Usage
 
 ### Discovery
