@@ -104,6 +104,8 @@ disk: /dev/sda (1905440 MB) [SCSI] LSI - SN #3600508e000000000f8253aac9a1abd0c
 >>> import pprint
 >>> from hwk import cpu
 >>> i = cpu.info()
+>>> i
+cpu (6 cores, 12 threads)
 >>> for c in i.cpus:
 ...     print c
 ... 
