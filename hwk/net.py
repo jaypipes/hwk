@@ -36,6 +36,10 @@ nics (list of `hwk.net.NIC` objects)
     Name of the network controller according to the system, e.g. 'wls1' or
     'enp0s25'
 
+  mac_address (string)
+
+    The MAC address of the NIC, as reported by the system
+
   model (string)
 
     String describing the processor model, if known
@@ -65,6 +69,7 @@ class NIC(object):
 
     def __init__(self, name):
         self.name = name
+        self.mac = None
         self.model = None
         self.vendor = None
 
@@ -108,6 +113,18 @@ def _linux_info():
         nic_name = d_info.get('ID_NET_NAME', d_info.get('ID_NET_NAME_PATH'))
 
         nic = NIC(nic_name)
+
+        mac = d_info.get('ID_NET_NAME_MAC')
+        if mac is not None:
+            # udev reports MAC addresses for network controllers in the form
+            # "{type}x[a-f0-9]12", where {type} is a two-letter code for the
+            # type of device. For example, here is what udev reports for an
+            # ethernet and a wireless network controller:
+            #
+            # ID_NET_NAME_MAC=enxe06995034837
+            # ID_NET_NAME_MAC=wlx1c7ee5299a06
+            nic.mac = mac[-12:]
+
         nic.vendor = d_info.get('ID_VENDOR_FROM_DATABASE')
         nic.model = d_info.get('ID_MODEL_FROM_DATABASE')
         nics.append(nic)

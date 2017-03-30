@@ -142,10 +142,10 @@ set(['acpi',
 >>> i
 net (2 NICs)
 >>> for nic in i.nics:
-...     print nic
+...     print "%8s %12s %s" % (nic.name, nic.mac, nic.vendor)
 ... 
-NIC enp0s25 [Intel Corporation] - 82567LF-2 Gigabit Network Connection
-NIC wls1 [Qualcomm Atheros] - AR5418 Wireless Network Adapter ...
+ enp0s25 e06995034837 Intel Corporation
+    wls1 1c7ee5299a06 Qualcomm Atheros
 ```
 
 ## Developers
