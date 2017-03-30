@@ -134,6 +134,20 @@ set(['acpi',
      'xtpr'])
 ```
 
+#### Network
+
+```
+>>> from hwk import net
+>>> i = net.info()
+>>> i
+net (2 NICs)
+>>> for nic in i.nics:
+...     print nic
+... 
+NIC enp0s25 [Intel Corporation] - 82567LF-2 Gigabit Network Connection
+NIC wls1 [Qualcomm Atheros] - AR5418 Wireless Network Adapter ...
+```
+
 ## Developers
 
 Contributions to `hwk` are welcomed! Fork the repo on GitHub and submit a pull
