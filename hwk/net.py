@@ -37,6 +37,10 @@ nics (list of `hwk.net.NIC` objects)
     Name of the network controller according to the system, e.g. 'wls1' or
     'enp0s25'
 
+  bus_type (string):
+
+    The bus type used by the NIC, if known, e.g. 'pci'
+
   mac_address (string)
 
     The MAC address of the NIC, as reported by the system
@@ -75,9 +79,11 @@ class NIC(object):
 
     def __init__(self, name):
         self.name = name
+        self.bus_type = None
         self.mac = None
         self.model = None
         self.vendor = None
+        self.enabled_features = set()
 
     def __repr__(self):
         vendor_str = ''
@@ -219,6 +225,7 @@ def _linux_info():
 
         nic.vendor = d_info.get('ID_VENDOR_FROM_DATABASE')
         nic.model = d_info.get('ID_MODEL_FROM_DATABASE')
+        nic.bus_type d_info.get('ID_BUS')
         features = _linux_nic_features(nic_name)
         if features is not None:
             nic.enabled_features = features[1]
