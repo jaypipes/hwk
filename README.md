@@ -146,6 +146,99 @@ net (2 NICs)
 ... 
  enp0s25 e06995034837 Intel Corporation
     wls1 1c7ee5299a06 Qualcomm Atheros
+>>> for nic in i.nics:
+...     print "NIC: " + str(nic.name)
+...     print "Enabled features: "
+...     pprint.pprint(nic.enabled_features)
+... 
+NIC: wls1
+Enabled features:
+set(['generic-receive-offload', 'netns-local'])
+NIC: enp0s25
+Enabled features:
+set(['generic-receive-offload',
+     'generic-segmentation-offload',
+     'highdma',
+     'receive-hashing',
+     'rx-checksumming',
+     'rx-vlan-offload',
+     'scatter-gather',
+     'tcp-segmentation-offload',
+     'tx-checksum-ip-generic',
+     'tx-checksumming',
+     'tx-scatter-gather',
+     'tx-tcp-segmentation',
+     'tx-tcp6-segmentation',
+     'tx-vlan-offload'])
+>>>
+>>> # The net.nic_features() function returns two sets, one of all features the
+>>> # NIC supports and the other containing only the features that are
+>>> # currently enabled on the NIC.
+>>>
+>>> pprint.pprint(net.nic_features('enp0s25'))
+(set(['busy-poll',
+     'fcoe-mtu',
+     'generic-receive-offload',
+     'generic-segmentation-offload',
+     'highdma',
+     'hw-tc-offload',
+     'l2-fwd-offload',
+     'large-receive-offload',
+     'loopback',
+     'netns-local',
+     'ntuple-filters',
+     'receive-hashing',
+     'rx-all',
+     'rx-checksumming',
+     'rx-fcs',
+     'rx-vlan-filter',
+     'rx-vlan-offload',
+     'rx-vlan-stag-filter',
+     'rx-vlan-stag-hw-parse',
+     'scatter-gather',
+     'tcp-segmentation-offload',
+     'tx-checksum-fcoe-crc',
+     'tx-checksum-ip-generic',
+     'tx-checksum-ipv4',
+     'tx-checksum-ipv6',
+     'tx-checksum-sctp',
+     'tx-checksumming',
+     'tx-fcoe-segmentation',
+     'tx-gre-csum-segmentation',
+     'tx-gre-segmentation',
+     'tx-gso-partial',
+     'tx-gso-robust',
+     'tx-ipxip4-segmentation',
+     'tx-ipxip6-segmentation',
+     'tx-lockless',
+     'tx-nocache-copy',
+     'tx-scatter-gather',
+     'tx-scatter-gather-fraglist',
+     'tx-sctp-segmentation',
+     'tx-tcp-ecn-segmentation',
+     'tx-tcp-mangleid-segmentation',
+     'tx-tcp-segmentation',
+     'tx-tcp6-segmentation',
+     'tx-udp_tnl-csum-segmentation',
+     'tx-udp_tnl-segmentation',
+     'tx-vlan-offload',
+     'tx-vlan-stag-hw-insert',
+     'udp-fragmentation-offload',
+     'vlan-challenged']),
+set(['generic-receive-offload',
+     'generic-segmentation-offload',
+     'highdma',
+     'receive-hashing',
+     'rx-checksumming',
+     'rx-vlan-offload',
+     'scatter-gather',
+     'tcp-segmentation-offload',
+     'tx-checksum-ip-generic',
+     'tx-checksumming',
+     'tx-scatter-gather',
+     'tx-tcp-segmentation',
+     'tx-tcp6-segmentation',
+     'tx-vlan-offload']))
 ```
 
 ## Developers

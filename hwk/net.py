@@ -14,6 +14,7 @@
 
 import os
 import re
+import subprocess
 import sys
 
 from hwk import udev
@@ -42,11 +43,16 @@ nics (list of `hwk.net.NIC` objects)
 
   model (string)
 
-    String describing the processor model, if known
+    String describing the NIC model, if known
 
   vendor (string)
 
-    The processor vendor, if known
+    The NIC vendor, if known
+
+  enabled_features (set of string)
+
+    The set of features the NIC supports and has enabled, e.g.
+    'rx-vlan-offload', 'tx-gso-partial', etc
 """
 
 
@@ -85,6 +91,92 @@ class NIC(object):
             vendor_str,
             model_str,
         )
+
+
+def _linux_nic_features(nic_name):
+    cmd = ['ethtool', '-k', nic_name]
+    try:
+        out = subprocess.check_output(cmd)
+        # The output of `ethtool -k <nic>` looks like the following:
+        # $ ethtool -k enp0s25
+        # Features for enp0s25:
+        # rx-checksumming: on
+        # tx-checksumming: on
+        #         tx-checksum-ipv4: off [fixed]
+        #         tx-checksum-ip-generic: on
+        #         tx-checksum-ipv6: off [fixed]
+        #         tx-checksum-fcoe-crc: off [fixed]
+        #         tx-checksum-sctp: off [fixed]
+        # scatter-gather: on
+        #         tx-scatter-gather: on
+        #         tx-scatter-gather-fraglist: off [fixed]
+        # tcp-segmentation-offload: on
+        #         tx-tcp-segmentation: on
+        #         tx-tcp-ecn-segmentation: off [fixed]
+        #         tx-tcp-mangleid-segmentation: off
+        #         tx-tcp6-segmentation: on
+        # udp-fragmentation-offload: off [fixed]
+        # generic-segmentation-offload: on
+        # generic-receive-offload: on
+        # large-receive-offload: off [fixed]
+        # rx-vlan-offload: on
+        # tx-vlan-offload: on
+        # ntuple-filters: off [fixed]
+        # receive-hashing: on
+        # highdma: on [fixed]
+        # rx-vlan-filter: off [fixed]
+        # vlan-challenged: off [fixed]
+        # tx-lockless: off [fixed]
+        # netns-local: off [fixed]
+        # tx-gso-robust: off [fixed]
+        # tx-fcoe-segmentation: off [fixed]
+        # tx-gre-segmentation: off [fixed]
+        # tx-gre-csum-segmentation: off [fixed]
+        # tx-ipxip4-segmentation: off [fixed]
+        # tx-ipxip6-segmentation: off [fixed]
+        # tx-udp_tnl-segmentation: off [fixed]
+        # tx-udp_tnl-csum-segmentation: off [fixed]
+        # tx-gso-partial: off [fixed]
+        # tx-sctp-segmentation: off [fixed]
+        # fcoe-mtu: off [fixed]
+        # tx-nocache-copy: off
+        # loopback: off [fixed]
+        # rx-fcs: off
+        # rx-all: off
+        # tx-vlan-stag-hw-insert: off [fixed]
+        # rx-vlan-stag-hw-parse: off [fixed]
+        # rx-vlan-stag-filter: off [fixed]
+        # l2-fwd-offload: off [fixed]
+        # busy-poll: off [fixed]
+        # hw-tc-offload: off [fixed]
+        all_features = set()
+        enabled = set()
+        for line in out.split('\n')[1:]:
+            parts = line.split(':')
+            if len(parts) != 2:
+                continue
+            feature = parts[0].strip()
+            on_str = parts[1].strip().split(' ')[0]
+            on = on_str == 'on'
+            all_features.add(feature)
+            if on:
+                enabled.add(feature)
+        return all_features, enabled
+    except subprocess.CalledProcessError:
+        return None
+
+
+def nic_features(nic_name):
+    """Given a NIC name, returns two sets of strings.  None if not mounted. The
+    first set are all the features, the second are all features that are
+    enabled.
+    """
+    try:
+        return {
+            "linux2": _linux_nic_features,
+        }[sys.platform](nic_name)
+    except KeyError:
+        return None
 
 
 def info():
@@ -127,6 +219,9 @@ def _linux_info():
 
         nic.vendor = d_info.get('ID_VENDOR_FROM_DATABASE')
         nic.model = d_info.get('ID_MODEL_FROM_DATABASE')
+        features = _linux_nic_features(nic_name)
+        if features is not None:
+            nic.enabled_features = features[1]
         nics.append(nic)
 
     res = Info()
