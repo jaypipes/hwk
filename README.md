@@ -146,6 +146,13 @@ net (2 NICs)
 ... 
  enp0s25 e06995034837 Intel Corporation
     wls1 1c7ee5299a06 Qualcomm Atheros
+>>>
+>>> for nic in i.nics:
+...     print "%8s %12s %12s" % (nic.name, nic.bus_type, nic.driver)
+...
+    wls1          pci        ath9k
+ enp0s25          pci       e1000e
+>>>
 >>> for nic in i.nics:
 ...     print "NIC: " + str(nic.name)
 ...     print "Enabled features: "

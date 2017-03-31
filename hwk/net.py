@@ -41,6 +41,10 @@ nics (list of `hwk.net.NIC` objects)
 
     The bus type used by the NIC, if known, e.g. 'pci'
 
+  driver (string)
+
+    The kernel network driver, if known, e.g. 'e1000e' or 'ath9k'
+
   mac_address (string)
 
     The MAC address of the NIC, as reported by the system
@@ -80,6 +84,7 @@ class NIC(object):
     def __init__(self, name):
         self.name = name
         self.bus_type = None
+        self.driver = None
         self.mac = None
         self.model = None
         self.vendor = None
@@ -225,7 +230,8 @@ def _linux_info():
 
         nic.vendor = d_info.get('ID_VENDOR_FROM_DATABASE')
         nic.model = d_info.get('ID_MODEL_FROM_DATABASE')
-        nic.bus_type d_info.get('ID_BUS')
+        nic.bus_type = d_info.get('ID_BUS')
+        nic.driver = d_info.get('ID_NET_DRIVER')
         features = _linux_nic_features(nic_name)
         if features is not None:
             nic.enabled_features = features[1]
