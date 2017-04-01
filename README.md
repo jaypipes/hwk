@@ -248,6 +248,17 @@ set(['generic-receive-offload',
      'tx-vlan-offload']))
 ```
 
+#### GPU
+
+```
+>>> from hwk import gpu
+>>> i = gpu.info()
+>>> i
+gpu (1 physical GPUs)
+>>> i.gpus[0]
+GPU @pci:0000:03:00.0 [NVIDIA Corporation] (GF114 [GeForce GTX 560 Ti])
+```
+
 ## Developers
 
 Contributions to `hwk` are welcomed! Fork the repo on GitHub and submit a pull

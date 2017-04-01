@@ -164,7 +164,7 @@ def _linux_total_threads():
 
 
 def info():
-    """Returns a `hwk.cpu.Info` object containing information on the CPU
+    """Returns a `hwk.cpu.Info` object containing information on the CPUs
     available to the system, or None if the information could not be
     determined.
     """

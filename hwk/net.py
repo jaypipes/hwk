@@ -240,4 +240,3 @@ def _linux_info():
     res = Info()
     res.nics = nics
     return res
-
