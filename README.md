@@ -257,6 +257,8 @@ set(['generic-receive-offload',
 gpu (1 physical GPUs)
 >>> i.gpus[0]
 GPU @pci:0000:03:00.0 [NVIDIA Corporation] (GF114 [GeForce GTX 560 Ti])
+>>> print "kernel driver: " + i.gpus[0].driver
+kernel driver: nouveau
 ```
 
 ## Developers

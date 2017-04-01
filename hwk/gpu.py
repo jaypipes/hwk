@@ -39,6 +39,10 @@ gpus (list of `hwk.gpu.GPU` objects)
     GPU's device address (if bus_type is 'pci', this will be the complete PCI
     address
 
+  driver (string)
+
+    The kernel device driver used for this GPU, if known
+
   model (string)
 
     String describing the processor model, if known
@@ -71,6 +75,7 @@ class GPU(object):
         self.vendor = None
         self.bus_type = None
         self.address = None
+        self.driver = None
 
     def __repr__(self):
         vendor_str = ''
@@ -123,6 +128,7 @@ def _linux_info():
 
         gpu.vendor = d_info.get('ID_VENDOR_FROM_DATABASE')
         gpu.model = d_info.get('ID_MODEL_FROM_DATABASE')
+        gpu.driver = d_info.get('DRIVER')
         gpus.append(gpu)
 
     res = Info()
