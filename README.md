@@ -261,6 +261,14 @@ GPU @pci:0000:03:00.0 [NVIDIA Corporation] (GF114 [GeForce GTX 560 Ti])
 kernel driver: nouveau
 ```
 
+#### System Topology and NUMA
+
+```
+>>> from hwk import topology
+>>> topology.info()
+topology NUMA (2 nodes)
+```
+
 ## Developers
 
 Contributions to `hwk` are welcomed! Fork the repo on GitHub and submit a pull
