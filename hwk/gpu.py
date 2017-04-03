@@ -50,6 +50,10 @@ gpus (list of `hwk.gpu.GPU` objects)
   vendor (string)
 
     The processor vendor, if known
+
+  vendor_id (string)
+
+    The ID of the vendor in hexadecimal, if known, e.g. '0x8086' or '0x168c'
 """
 
 
@@ -127,6 +131,11 @@ def _linux_info():
         gpu.bus_type = 'pci'
 
         gpu.vendor = d_info.get('ID_VENDOR_FROM_DATABASE')
+        pci_id = d_info.get('PCI_ID')
+        if pci_id is not None:
+            vendor_id, product_id = pci_id.split(':')
+            vendor_id = '0x%s' % vendor_id.lower()
+            gpu.vendor_id = vendor_id
         gpu.model = d_info.get('ID_MODEL_FROM_DATABASE')
         gpu.driver = d_info.get('DRIVER')
         gpus.append(gpu)
