@@ -142,10 +142,10 @@ set(['acpi',
 >>> i
 net (2 NICs)
 >>> for nic in i.nics:
-...     print "%8s %12s %s" % (nic.name, nic.mac, nic.vendor)
+...     print "%8s %12s %s %s" % (nic.name, nic.mac, nic.vendor_id, nic.vendor)
 ... 
- enp0s25 e06995034837 Intel Corporation
-    wls1 1c7ee5299a06 Qualcomm Atheros
+ enp0s25 e06995034837 0x8086 Intel Corporation
+    wls1 1c7ee5299a06 0x168c Qualcomm Atheros
 >>>
 >>> for nic in i.nics:
 ...     print "%8s %12s %12s" % (nic.name, nic.bus_type, nic.driver)

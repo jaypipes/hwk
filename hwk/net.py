@@ -57,6 +57,10 @@ nics (list of `hwk.net.NIC` objects)
 
     The NIC vendor, if known
 
+  vendor_id (string)
+
+    The ID of the vendor in hexadecimal, if known, e.g. '0x8086' or '0x168c'
+
   enabled_features (set of string)
 
     The set of features the NIC supports and has enabled, e.g.
@@ -88,6 +92,7 @@ class NIC(object):
         self.mac = None
         self.model = None
         self.vendor = None
+        self.vendor_id = None
         self.enabled_features = set()
 
     def __repr__(self):
@@ -229,6 +234,7 @@ def _linux_info():
             nic.mac = mac[-12:]
 
         nic.vendor = d_info.get('ID_VENDOR_FROM_DATABASE')
+        nic.vendor_id = d_info.get('ID_VENDOR_ID')
         nic.model = d_info.get('ID_MODEL_FROM_DATABASE')
         nic.bus_type = d_info.get('ID_BUS')
         nic.driver = d_info.get('ID_NET_DRIVER')
