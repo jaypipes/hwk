@@ -26,6 +26,17 @@ architecture (string)
 
   A string indicating the overall architecture of the system topology (e.g.
   'NUMA' or 'SMP')
+
+nodes (list of `hwk.topology.Node` objects)
+
+  A list of objects representing one or more processors, memory banks (caches)
+  and the bus/interconnect between them.
+
+  `hwk.topology.Node` attributes:
+
+  id (int)
+
+    0-based index of the node within the system
 """
 
 
