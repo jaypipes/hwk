@@ -46,3 +46,13 @@ class memoize(object):
     def __get__(self, obj, objtype):
         """Support instance methods."""
         return functools.partial(self.__call__, obj)
+
+
+def hextoi(subject):
+    """Given a string representing an integer in hexadecimal notation, return
+    the integer in base 10 notation.
+    """
+    try:
+        return int(subject, 16)
+    except ValueError:
+        return None

@@ -15,6 +15,7 @@
 import os
 import sys
 
+from hwk import cpu
 from hwk import utils
 
 _LINUX_SYS_DEVICES_SYSTEM_NODE_DIR = '/sys/devices/system/node/'
@@ -37,6 +38,16 @@ nodes (list of `hwk.topology.Node` objects)
   id (int)
 
     0-based index of the node within the system
+
+  processor_set (set of int)
+
+    A set of integers representing the logical processors that are associated
+    with this node. For example, assume a dual Intel® Xeon® Processor E5-4650
+    v2 system. Each E5-4650 processor has 10 cores with 2 hardware threads per
+    core, giving 40 total logical processors in the system.  Suppose the system
+    reported the second Xeon processor's (NUMA node) cores (and their thread
+    siblings) as logical processors 10-19 and 31-39, the value of processor_set
+    would be set([10,11,12,13,14,15,16,17,18,19,31,32,33,34,35,36,37,38,39]).
 """
 
 
@@ -61,11 +72,39 @@ class Node(object):
 
     def __init__(self, node_id):
         self.id = int(node_id)
+        self.processor_set = set()
 
     def __repr__(self):
         return "Node %d" % (
             self.id,
         )
+
+
+def node_processor_set(node_id):
+    """Returns a set of ints representing the logical processor IDs associated
+    with the supplied NUMA node.
+    """
+    try:
+        return {
+            "linux2": _linux_node_processor_set,
+        }[sys.platform](node_id)
+    except KeyError:
+        return None
+
+
+@utils.memoize
+def _linux_node_processor_set(node_id):
+    # The /sys/devices/node/nodeX/cpumask file contains a hexadecimal string
+    # that indicates which of the logical processors on the system are
+    # associated with node X
+    path = os.path.join(
+        _LINUX_SYS_DEVICES_SYSTEM_NODE_DIR,
+        'node' + str(node_id),
+        'cpumap',
+    )
+    cpumap = utils.hextoi(open(path, 'rb').read())
+    num_cpus = cpu.total_threads()
+    return set(x for x in range(num_cpus) if cpumap & (1 << x))
 
 
 def info():
@@ -86,7 +125,9 @@ def _linux_info():
     nodes = []
     for filename in os.listdir(_LINUX_SYS_DEVICES_SYSTEM_NODE_DIR):
         if filename.startswith('node'):
-            node = Node(filename[4:])
+            node_id = filename[4:]
+            node = Node(node_id)
+            node.processor_set = _linux_node_processor_set(node_id)
             nodes.append(node)
 
     res = Info()
