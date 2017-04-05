@@ -337,6 +337,23 @@ L1d cache (32 KB) set([0, 2])
 L2 cache (256 KB) set([0, 2])
 L2 cache (256 KB) set([1, 3])
 L3 cache (3072 KB) set([0, 1, 2, 3])
+>>>
+>>> c0 = n.cores[0]
+>>> for cache in sorted(c0.caches, key=lambda c: c.size):
+...     print cache
+...
+Traceback (most recent call last):
+File "<stdin>", line 1, in <module>
+File "<stdin>", line 1, in <lambda>
+AttributeError: 'Cache' object has no attribute 'size'
+>>> for cache in sorted(c0.caches, key=lambda c: c.size_bytes):
+...     print cache
+...
+L1i cache (32 KB)
+L1d cache (32 KB)
+L2 cache (256 KB)
+L3 cache (3072 KB)
+
 ```
 
 ## Developers

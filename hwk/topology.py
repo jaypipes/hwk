@@ -68,6 +68,10 @@ nodes (list of `hwk.topology.Node` objects)
 
       The set of logical processor IDs for all threads in the core
 
+    caches (list of `hwk.topology.Cache` objects)
+
+      The memory caches that are associated with processors on this core
+
   caches (list of `hwk.topology.Cache` objects)
 
     A list of objects representing one or more memory caches associated with
@@ -132,6 +136,7 @@ class Core(object):
     def __init__(self, core_id):
         self.id = int(core_id)
         self.processor_set = set()
+        self.caches = []
 
     @property
     def threads(self):
@@ -237,7 +242,15 @@ def _linux_node_cores(node_id):
             cores[core_id] = core
         core.processor_set.add(lp_id)
 
-    return cores.values()
+    cores = cores.values()
+    caches = _linux_node_caches(node_id)
+    # Map the cache to the core, depending on intersection of core's
+    # processor_set and cache's processor_set.
+    for cache in caches:
+        for core in cores:
+            if core.processor_set & cache.processor_set:
+                core.caches.append(cache)
+    return cores
 
 
 def node_caches(node_id):
@@ -325,8 +338,8 @@ def _linux_info():
             node_id = filename[4:]
             node = Node(node_id)
             node.processor_set = _linux_node_processor_set(node_id)
-            node.cores = _linux_node_cores(node_id)
             node.caches = _linux_node_caches(node_id)
+            node.cores = _linux_node_cores(node_id)
             nodes.append(node)
 
     res = Info()
