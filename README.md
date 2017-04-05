@@ -270,10 +270,16 @@ From a single-processor Intel Core i7 6-core with 2 hardware threads per core:
 >>> i = topology.info()
 >>> i
 topology SMP (1 nodes)
->>> i.nodes[0]
-Node 0
->>> i.nodes[0].processor_set
+>>> n = i.nodes[0]
+>>> n
+Node 0 (6 cores)
+>>> n.processor_set
 set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+>>> c2 = n.cores[2]
+>>> c2
+Core 2 (2 hardware threads)
+>>> c2.processor_set
+set([10, 4])
 ```
 
 From a NUMA system with 2 processors having 4 cores each with 2 hardware
