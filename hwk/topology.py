@@ -16,6 +16,7 @@ import os
 import sys
 
 from hwk import cpu
+from hwk import units
 from hwk import utils
 
 _LINUX_SYS_DEVICES_SYSTEM_NODE_DIR = '/sys/devices/system/node/'
@@ -66,6 +67,31 @@ nodes (list of `hwk.topology.Node` objects)
     processor_set (set of int)
 
       The set of logical processor IDs for all threads in the core
+
+  memory_caches (list of `hwk.topology.MemoryCache` objects)
+
+    A list of objects representing one or more memory caches associated with
+    the node
+
+    `hwk.topology.MemoryCache` attributes:
+
+    level (int)
+
+      1-based number representing the "distance" or "cost to access"
+      from the processor. L1 cache would have 1, L3 would have 3, etc
+
+    type (string)
+
+      String representing the type of information that is stored in the cache.
+      May be 'unified', 'instruction' or 'data'
+
+    size_bytes (int)
+
+      Size in bytes of the cache
+
+    processor_set (int)
+
+      Set of logical processor IDs for all threads having access to the cache
 """
 
 
@@ -114,6 +140,28 @@ class Core(object):
         return "Core %d (%d hardware threads)" % (
             self.id,
             self.threads,
+        )
+
+
+class MemoryCache(object):
+
+    def __init__(self, index_id):
+        self.id = index_id
+        self.level = None
+        self.size_bytes = None
+        self.processor_set = set()
+
+    def __repr__(self):
+        size_kb = self.size_bytes // units.KB
+        type_str = ''
+        if self.type == 'instruction':
+            type_str = 'i'
+        elif self.type == 'data':
+            type_str = 'd'
+        cache_id_str = 'L%d%s' % (self.level, type_str)
+        return "%s (%d KB)" % (
+            cache_id_str,
+            size_kb,
         )
 
 
@@ -181,13 +229,74 @@ def _linux_node_cores(node_id):
         # filename of the CPU
         lp_id = int(filename[3:])
         core_id_path = os.path.join(cpu_path, 'topology', 'core_id')
-        core_id = int(open(core_id_path).read())
+        core_id = int(open(core_id_path, 'rb').read())
         if core_id in cores:
             core = cores[core_id]
         else:
             core = Core(core_id)
             cores[core_id] = core
         core.processor_set.add(lp_id)
+
+    return cores.values()
+
+
+def node_memory_caches(node_id):
+    """Returns a list of `hwk.topology.MemoryCache` objects representing the physical
+    varius memory caches associated to cores/threads in the supplied NUMA node.
+    """
+    try:
+        return {
+            "linux2": _linux_node_memory_caches,
+        }[sys.platform](node_id)
+    except KeyError:
+        return None
+
+
+@utils.memoize
+def _linux_node_memory_caches(node_id):
+    # The /sys/devices/node/nodeX directory contains a subdirectory called
+    # 'cpuX' for each logical processor assigned to the node. Each of those
+    # subdirectories containers a cache subdirectory which contains a number of
+    # subdirectories beginning with 'index' and ending in the cache's internal
+    # 0-based identifier. Those subdirectories contain a number of files,
+    # including 'shared_cpu_list', 'size', and 'type' which we use to determine
+    # cache characteristics.
+    path = os.path.join(
+        _LINUX_SYS_DEVICES_SYSTEM_NODE_DIR,
+        'node' + str(node_id),
+    )
+    caches = {}
+    for filename in os.listdir(path):
+        if not filename.startswith('cpu'):
+            continue
+        cpu_path = os.path.join(path, filename)
+        if not os.path.isdir(cpu_path):
+            # There are two files in the node directory that start with 'cpu'
+            # but are not subdirectories ('cpulist' and 'cpumap'). Ignore these
+            # files.
+            continue
+        # Grab the logical processor ID by cutting the integer from the
+        # filename of the CPU
+        lp_id = int(filename[3:])
+        for cpu_filename in os.listdir(cpu_path):
+            if not cpu_filename.startswith('index'):
+                continue
+            type_path = os.path.join(cpu_path, cpu_filename, 'type')
+            type = open(type_path, 'rb').read().lower()
+            level_path = os.path.join(cpu_path, cpu_filename, 'level')
+            level = int(open(level_path, 'rb').read())
+            scpu_path = os.path.join(cpu_path, cpu_filename, 'shared_cpu_map')
+            shared_cpu_map = open(scpu_path, 'rb').read()
+            cache_id = (level, shared_processors)
+            if cache_id in caches:
+                cache = caches[cache_id]
+            else:
+                cache = MemoryCache(cache_id)
+                caches[cache_id] = cache
+            cache.level = level
+            cache.type = type
+            cache.size_bytes = int(size[:-1]) * units.KB
+            cache.processor_set.add(lp_id)
 
     return cores.values()
 
@@ -214,6 +323,7 @@ def _linux_info():
             node = Node(node_id)
             node.processor_set = _linux_node_processor_set(node_id)
             node.cores = _linux_node_cores(node_id)
+            node.memory_caches = _linux_node_memory_caches(node_id)
             nodes.append(node)
 
     res = Info()
