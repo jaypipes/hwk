@@ -297,6 +297,48 @@ set([0, 1, 2, 3, 8, 9, 10, 11])
 set([4, 5, 6, 7, 12, 13, 14, 15])
 ```
 
+Here's topology information that shows the memory caches and their association
+with cores and threads, along with their sizes, on a laptop running a 4-core
+i5:
+
+```
+>>> import pprint
+>>> from hwk import topology
+>>> i = topology.info()
+>>> i
+topology SMP (1 nodes)
+>>> n = i.nodes[0]
+>>> n
+Node 0 (2 cores)
+>>> for c in n.cores:
+...     print c
+...     print c.processor_set
+... 
+Core 0 (2 hardware threads)
+set([0, 2])
+Core 1 (2 hardware threads)
+set([1, 3])
+>>> caches = sorted(n.caches, key=lambda c: c.level)
+>>> pprint.pprint(caches)
+[L1d cache (32 KB),
+ L1i cache (32 KB),
+ L1i cache (32 KB),
+ L1d cache (32 KB),
+ L2 cache (256 KB),
+ L2 cache (256 KB),
+ L3 cache (3072 KB)]
+>>> for c in caches:
+...     print c, c.processor_set
+... 
+L1d cache (32 KB) set([1, 3])
+L1i cache (32 KB) set([0, 2])
+L1i cache (32 KB) set([1, 3])
+L1d cache (32 KB) set([0, 2])
+L2 cache (256 KB) set([0, 2])
+L2 cache (256 KB) set([1, 3])
+L3 cache (3072 KB) set([0, 1, 2, 3])
+```
+
 ## Developers
 
 Contributions to `hwk` are welcomed! Fork the repo on GitHub and submit a pull
