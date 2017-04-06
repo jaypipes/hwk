@@ -24,8 +24,7 @@ class TestMemory(base.TestCase):
     @mock.patch('os.path.isdir', return_value=True)
     @mock.patch('os.listdir')
     @mock.patch('sys.platform', 'linux2')
-    def test_supported_page_sizes_linux(self, listdir_mock,
-            is_dir_mock):
+    def test_supported_page_sizes_linux(self, listdir_mock, is_dir_mock):
         listdir_mock.return_value = [
             'hugepages-2048kb',
             'hugepages-1048576kb',

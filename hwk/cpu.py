@@ -12,8 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import os
-import re
 import sys
 
 from hwk import utils
@@ -66,7 +64,7 @@ cpus (list of `hwk.cpu.CPU` objects)
     equal 2 x 4 x 2 = 16. Now, let's also assume that the system sees the
     processors 4-7 and 12-15 belonging to the cores on the second CPU, the
     processor_map might look like the following:
-    
+
         {
             0: set([4, 5]),
             1: set([6, 7]),
@@ -206,7 +204,7 @@ def _linux_info():
             if len(s.strip()) > 0
         )
         core_ids = set(c['core id'] for c in procs_in_cpu)
-        
+
         # OK, so this looks exceedingly weird, but what we're doing here is
         # finding the zero-based index of the core within the physical
         # package/socket. Turns out that certain vendors return a "core id"

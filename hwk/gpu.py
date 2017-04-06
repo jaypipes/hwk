@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import os
 import subprocess
 import sys
 
@@ -115,7 +114,7 @@ def _linux_info():
     cmd = ['lspci', '-D']
     out = subprocess.check_output(cmd).strip()
     for line in out.split('\n'):
-        if not 'VGA' in line:
+        if 'VGA' not in line:
             # TODO(jaypipes): Figure out if there are any GPUs that do **NOT**
             # indicate they are a VGA-compatible controller...
             continue

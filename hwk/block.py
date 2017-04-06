@@ -35,7 +35,8 @@ total_size_bytes (int)
 
 disks (list of `hwk.block.Disk` objects)
 
-  A list of objects describing disk block devices that the host system knows about.
+  A list of objects describing disk block devices that the host system knows
+  about
 
   `hwk.block.Device` attributes:
 
@@ -118,7 +119,10 @@ class Info(object):
         if self.total_size_bytes is not None:
             tsb = math.floor(self.total_size_bytes / units.MB)
             tsb = str(tsb) + ' MB'
-        return "block (%d disk block devices, %s total size)" % (len(self.disks), tsb)
+        return "block (%d disk block devices, %s total size)" % (
+            len(self.disks),
+            tsb,
+        )
 
     def describe(self):
         return _INFO_HELP
@@ -128,7 +132,7 @@ class Disk(object):
     """Object describing a disk block device."""
 
     def __init__(self, name, size_bytes=None, bus_type=None, vendor=None,
-            serial_no=None):
+                 serial_no=None):
         self.name = name
         self.size_bytes = size_bytes
         self.bus_type = bus_type
@@ -155,7 +159,7 @@ class Partition(object):
     """Object describing a partition of a disk block device."""
 
     def __init__(self, disk, name=None, label=None, uuid=None, size_bytes=None,
-            type=None, is_readonly=None, mount_point=None):
+                 type=None, is_readonly=None, mount_point=None):
         self.disk = disk
         self.name = name
         self.uuid = uuid
@@ -178,7 +182,7 @@ class Partition(object):
         return "/dev/%s (%d MB) [%s]%s%s" % (
             self.name,
             math.floor((self.size_bytes or 0) / units.MB),
-            self.type,
+            type_str,
             mount_str,
             uuid_str,
         )

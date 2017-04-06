@@ -61,7 +61,7 @@ nodes (list of `hwk.topology.Node` objects)
       0-based index of the core within the system as a whole
 
     threads (int)
-    
+
       Number of hardware threads in the core
 
     processor_set (set of int)
@@ -301,7 +301,11 @@ def _linux_node_caches(node_id):
             level = int(open(level_path, 'rb').read().strip())
             size_path = os.path.join(cache_path, cpu_filename, 'size')
             size = open(size_path, 'rb').read().strip()
-            scpu_path = os.path.join(cache_path, cpu_filename, 'shared_cpu_map')
+            scpu_path = os.path.join(
+                cache_path,
+                cpu_filename,
+                'shared_cpu_map',
+            )
             shared_cpu_map = open(scpu_path, 'rb').read().strip()
             cache_key = (level, type, shared_cpu_map)
             if cache_key in caches:

@@ -12,8 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import math
 import gzip
+import math
 import os
 import re
 import sys
@@ -100,6 +100,7 @@ def total_physical_bytes():
 # System log lines will look similar to the following:
 # ... kernel: [0.000000] Memory: 24633272K/25155024K ...
 _SYSLOG_MEM_LINE_RE = re.compile(r'Memory:\s+\d+K\/(\d+)K')
+
 
 @utils.memoize
 def _linux_total_physical_bytes():
