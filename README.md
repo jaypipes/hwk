@@ -298,8 +298,8 @@ set([4, 5, 6, 7, 12, 13, 14, 15])
 ```
 
 Here's topology information that shows the memory caches and their association
-with cores and threads, along with their sizes, on a laptop running a 4-core
-i5:
+with cores and threads, along with their sizes, on a laptop running an Intel i5
+processor with 4 hardware threads:
 
 ```
 >>> import pprint
@@ -339,13 +339,6 @@ L2 cache (256 KB) set([1, 3])
 L3 cache (3072 KB) set([0, 1, 2, 3])
 >>>
 >>> c0 = n.cores[0]
->>> for cache in sorted(c0.caches, key=lambda c: c.size):
-...     print cache
-...
-Traceback (most recent call last):
-File "<stdin>", line 1, in <module>
-File "<stdin>", line 1, in <lambda>
-AttributeError: 'Cache' object has no attribute 'size'
 >>> for cache in sorted(c0.caches, key=lambda c: c.size_bytes):
 ...     print cache
 ...
