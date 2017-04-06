@@ -12,10 +12,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import testtools
+import unittest
 
 
-class TestCase(testtools.TestCase):
+class TestCase(unittest.TestCase):
     """Test case base class for all tests."""
 
     def setUp(self):

@@ -1,5 +1,5 @@
-# Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
-#
+#!/usr/bin/env python
+
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -13,17 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# THIS FILE IS MANAGED BY THE GLOBAL REQUIREMENTS REPO - DO NOT EDIT
-import setuptools
+from distutils.core import setup
 
-# In python < 2.7.4, a lazy loading of package `pbr` will break
-# setuptools if some other modules registered functions in `atexit`.
-# solution from: http://bugs.python.org/issue15881#msg170215
-try:
-    import multiprocessing  # noqa
-except ImportError:
-    pass
+VERSION = 0.1
+DESCRIPTION = (
+    "The HardWare toolKit - A small Python library containing hardware "
+    "discovery and configuration tools"
+)
 
-setuptools.setup(
-    setup_requires=['pbr>=1.8'],
-    pbr=True)
+setup(
+    name='hwk',
+    version=str(VERSION),
+    description=DESCRIPTION,
+    author='Jay Pipes',
+    author_email='jaypipes@gmail.com',
+    url='http://github.com/jaypipes/hwk',
+    packages=['hwk'],
+)
