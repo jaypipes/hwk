@@ -16,6 +16,8 @@
 from distutils.core import setup
 
 VERSION = 0.1
+URL = 'https://github.com/jaypipes/hwk'
+DOWNLOAD_URL = '%s/archive/%s.tar.gz' % (URL, VERSION)
 DESCRIPTION = (
     "The HardWare toolKit - A small Python library containing hardware "
     "discovery and configuration tools"
@@ -27,6 +29,7 @@ setup(
     description=DESCRIPTION,
     author='Jay Pipes',
     author_email='jaypipes@gmail.com',
-    url='http://github.com/jaypipes/hwk',
+    url=URL,
+    download_url=DOWNLOAD_URL,
     packages=['hwk'],
 )

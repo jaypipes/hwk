@@ -1,3 +1,5 @@
+dist/
+MANIFEST
 *.egg*
 .cache
 build/
