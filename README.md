@@ -1,4 +1,4 @@
-# hwk - The HardWare toolKit library [![Build Status](https://travis-ci.org/jaypipes/hwk.svg?branch=master)](https://travis-ci.org/jaypipes/hwk)
+# hwk - The HardWare toolKit library [![PyPI version](https://badge.fury.io/py/hwk.svg)](https://badge.fury.io/py/hwk)[![Build Status](https://travis-ci.org/jaypipes/hwk.svg?branch=master)](https://travis-ci.org/jaypipes/hwk)
 
 `hwk` is a small Python library containing hardware discovery and configuration
 tools.
