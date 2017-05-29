@@ -138,6 +138,7 @@ class Disk(object):
         self.bus_type = bus_type
         self.vendor = vendor
         self.serial_no = serial_no
+        self.partitions = []
 
     def __repr__(self):
         vendor_str = ''
