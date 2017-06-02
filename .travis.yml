@@ -7,3 +7,6 @@ install:
     - pip install -r test-requirements.txt
 script:
     - tox
+# Using sudo triggers a real virtual machine as opposed to a container, which
+# allows ghw to actually determine things like host memory or block storage...
+sudo: required
