@@ -17,6 +17,7 @@ import math
 import os
 import platform
 import re
+import sys
 
 import six
 
@@ -198,7 +199,7 @@ falling back to setting the total physical amount of memory to the total usable
 amount of memory
 """
 
-        print(os.stderr, msg)
+        print(sys.stderr, msg)
         tpb = tub
     res.total_physical_bytes = tpb
     res.total_usable_bytes = tub
