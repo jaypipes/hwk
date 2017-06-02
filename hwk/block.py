@@ -15,7 +15,7 @@
 import math
 import os
 import subprocess
-import sys
+import platform
 
 from hwk import udev
 from hwk import units
@@ -193,12 +193,9 @@ def disks():
     """Returns a list of `hwk.block.Disk` objects that describe all disk devices
     the host system knows about.
     """
-    try:
-        return {
-            "linux2": _linux_disks,
-        }[sys.platform]()
-    except KeyError:
-        return None
+    return {
+        "Linux": _linux_disks,
+    }[platform.system()]()
 
 
 def _linux_disks():
@@ -270,12 +267,9 @@ def disk_size_bytes(disk_name):
     """Returns the total physical storage capacity of specified disk in
     bytes or None if the information could not be determined.
     """
-    try:
-        return {
-            "linux2": _linux_disk_size_bytes,
-        }[sys.platform](disk_name)
-    except KeyError:
-        return None
+    return {
+        "Linux": _linux_disk_size_bytes,
+    }[platform.system()](disk_name)
 
 
 def _linux_partition_size_bytes(part_name):
@@ -309,12 +303,9 @@ def total_size_bytes():
     """Returns the total physical storage capacity of attached disks in bytes
     or None if the information could not be determined.
     """
-    try:
-        return {
-            "linux2": _linux_total_size_bytes,
-        }[sys.platform]()
-    except KeyError:
-        return None
+    return {
+        "Linux": _linux_total_size_bytes,
+    }[platform.system()]()
 
 
 @utils.memoize
@@ -327,12 +318,9 @@ def info():
     block devices available to the system, or None if the information could not
     be determined.
     """
-    try:
-        return {
-            "linux2": _linux_info,
-        }[sys.platform]()
-    except KeyError:
-        return None
+    return {
+        "Linux": _linux_info,
+    }[platform.system()]()
 
 
 def _linux_info():

@@ -14,6 +14,8 @@
 
 import subprocess
 
+import six
+
 
 def device_properties(path):
     """Given a device path, e.g. '/sys/class/block/sda', returns a dict of
@@ -51,7 +53,7 @@ def device_properties(path):
     # TAGS=:systemd:
     # USEC_INITIALIZED=10219204
     res = {}
-    for line in out.strip().split('\n'):
+    for line in six.text_type(out.strip()).split('\n'):
         parts = line.split('=', 1)
         if len(parts) != 2:
             continue
