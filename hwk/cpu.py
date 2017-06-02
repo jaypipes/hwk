@@ -12,10 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import sys
-
-from hwk import utils
-
+import platform
 
 _INFO_HELP = """CPU subsystem
 ===============================================================================
@@ -131,12 +128,9 @@ def total_cores():
     """Returns the total physical cores or None if the information could not be
     determined.
     """
-    try:
-        return {
-            "linux2": _linux_total_cores,
-        }[sys.platform]()
-    except KeyError:
-        return None
+    return {
+        "Linux": _linux_total_cores,
+    }[platform.system()]()
 
 
 def _linux_total_cores():
@@ -148,12 +142,9 @@ def total_threads():
     """Returns the total hardware threads or None if the information could not
     be determined.
     """
-    try:
-        return {
-            "linux2": _linux_total_threads,
-        }[sys.platform]()
-    except KeyError:
-        return None
+    return {
+        "Linux": _linux_total_threads,
+    }[platform.system()]()
 
 
 def _linux_total_threads():
@@ -166,17 +157,13 @@ def info():
     available to the system, or None if the information could not be
     determined.
     """
-    try:
-        return {
-            "linux2": _linux_info,
-        }[sys.platform]()
-    except KeyError:
-        return None
+    return {
+        "Linux": _linux_info,
+    }[platform.system()]()
 
 
-@utils.memoize
 def _linux_info():
-    cpu_info = open('/proc/cpuinfo', 'rb').readlines()
+    cpu_info = open('/proc/cpuinfo', 'r').readlines()
     cpu_attrs = []
     cur_cpu_attrs = {}
     for line in cpu_info:
@@ -184,7 +171,7 @@ def _linux_info():
             cpu_attrs.append(cur_cpu_attrs)
             cur_cpu_attrs = {}
             continue
-        key, value = line.split(':')
+        key, value = line.split(":")
         key = key.strip()
         cur_cpu_attrs[key] = value
 
