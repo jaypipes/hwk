@@ -15,11 +15,10 @@
 import gzip
 import math
 import os
+import platform
 import re
-import sys
 
-from hwk import utils
-
+import six
 
 _INFO_HELP = """Memory subsystem
 ===============================================================================
@@ -52,11 +51,11 @@ class Info(object):
         tpb = 'unknown'
         if self.total_physical_bytes is not None:
             tpb = math.floor(self.total_physical_bytes / (1024 * 1024))
-            tpb = str(tpb) + ' MB'
+            tpb = six.text_type(tpb) + ' MB'
         tub = 'unknown'
         if self.total_usable_bytes is not None:
             tub = math.floor(self.total_usable_bytes / (1024 * 1024))
-            tub = str(tub) + ' MB'
+            tub = six.text_type(tub) + ' MB'
         return "memory (%s physical, %s usable)" % (tpb, tub)
 
     def describe(self):
@@ -69,13 +68,12 @@ def supported_page_sizes():
     """
     try:
         return {
-            "linux2": _linux_supported_page_sizes,
-        }[sys.platform]()
+            "Linux": _linux_supported_page_sizes,
+        }[platform.system()]()
     except KeyError:
         return None
 
 
-@utils.memoize
 def _linux_supported_page_sizes():
     # In Linux, /sys/kernel/mm/hugepages contains a directory per page size
     # supported by the kernel. The directory name corresponds to the pattern
@@ -91,8 +89,8 @@ def total_physical_bytes():
     """
     try:
         return {
-            "linux2": _linux_total_physical_bytes,
-        }[sys.platform]()
+            "Linux": _linux_total_physical_bytes,
+        }[platform.system()]()
     except KeyError:
         return None
 
@@ -102,14 +100,13 @@ def total_physical_bytes():
 _SYSLOG_MEM_LINE_RE = re.compile(r'Memory:\s+\d+K\/(\d+)K')
 
 
-@utils.memoize
 def _linux_total_physical_bytes():
     # In Linux, the total physical memory can be determined by looking at the
     # output of dmidecode, however dmidecode requires root privileges to run,
     # so instead we examine the system logs for startup information containing
     # total physical memory and cache the results of this.
     def _find_physical_kb(line):
-        matched = _SYSLOG_MEM_LINE_RE.search(line)
+        matched = _SYSLOG_MEM_LINE_RE.search(six.text_type(line))
         if matched:
             return int(matched.group(1)) * 1024
         return None
@@ -131,12 +128,15 @@ def _linux_total_physical_bytes():
         else:
             opener = open
 
-        path = os.path.join(log_dir, filename)
-        with opener(path, 'rb') as f:
-            for line in f.readlines():
-                size = _find_physical_kb(line)
-                if size is not None:
-                    return size
+        try:
+            path = os.path.join(log_dir, filename)
+            with opener(path, 'rb') as f:
+                for line in f.readlines():
+                    size = _find_physical_kb(line)
+                    if size is not None:
+                        return size
+        except IOError:
+            return None
     return None
 
 
@@ -145,12 +145,9 @@ def info():
     available to the system, or None if the information could not be
     determined.
     """
-    try:
-        return {
-            "linux2": _linux_info,
-        }[sys.platform]()
-    except KeyError:
-        return None
+    return {
+        "Linux": _linux_info,
+    }[platform.system()]()
 
 
 def _linux_info():
@@ -181,7 +178,7 @@ def _linux_info():
     values = {}
     for line in meminfo_lines:
         parts = line.split()
-        key = parts[0].strip(': ')
+        key = parts[0].strip(six.b(': '))
         value = int(parts[1].strip())
         in_kb = (len(parts) == 3 and parts[2].strip() == 'kB')
         if in_kb:
@@ -190,6 +187,19 @@ def _linux_info():
 
     res = Info()
     res.supported_page_sizes = _linux_supported_page_sizes()
-    res.total_physical_bytes = _linux_total_physical_bytes()
-    res.total_usable_bytes = values['MemTotal']
+    tub = values[six.b('MemTotal')]
+    tpb = _linux_total_physical_bytes()
+    if tpb is None:
+        msg = """
+WARNING: Could not determine total physical bytes of memory. This may be due to
+the host being a virtual machine or container with no /var/log/syslog file, or
+the current user may not have necessary privileges to read the syslog. We are
+falling back to setting the total physical amount of memory to the total usable
+amount of memory
+"""
+
+        print(os.stderr, msg)
+        tpb = tub
+    res.total_physical_bytes = tpb
+    res.total_usable_bytes = tub
     return res
