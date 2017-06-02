@@ -17,7 +17,6 @@ import subprocess
 import sys
 
 from hwk import udev
-from hwk import utils
 
 
 _LINUX_SYS_CLASS_NET_DIR = '/sys/class/net'

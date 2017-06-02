@@ -17,12 +17,12 @@ import os
 import subprocess
 import platform
 
-from hwk import udev
 from hwk import units
 
 
 _SECTOR_SIZE = 512
 _LINUX_SYS_BLOCK_DIR = '/sys/block/'
+_LINUX_DEV_DISK_BY_ID = '/dev/disk/by-id/'
 _LINUX_SYS_CLASS_BLOCK_DIR = '/sys/class/block/'
 _INFO_HELP = """Block device subsystem
 ===============================================================================
@@ -91,15 +91,6 @@ partitions (list of `hwk.block.Partition` objects)
 
     Indicates where, if any, the partition is mounted in the system
 
-  uuid (string)
-
-    Optional string identifier for the partition. Can be either a UUID or a
-    shorter identifier for older partition types (like MS-DOS)
-
-  label (string)
-
-    Optional string label for the partition
-
   is_readonly (bool)
 
     True if the partition is marked read-only
@@ -158,12 +149,10 @@ class Disk(object):
 class Partition(object):
     """Object describing a partition of a disk block device."""
 
-    def __init__(self, disk, name=None, label=None, uuid=None, size_bytes=None,
-                 type=None, is_readonly=None, mount_point=None):
+    def __init__(self, disk, name=None, size_bytes=None, type=None,
+                 is_readonly=None, mount_point=None):
         self.disk = disk
         self.name = name
-        self.uuid = uuid
-        self.label = label
         self.mount_point = mount_point
         self.size_bytes = size_bytes
         self.type = type
@@ -176,15 +165,11 @@ class Partition(object):
         mount_str = ''
         if self.mount_point is not None:
             mount_str = ' mounted@' + self.mount_point
-        uuid_str = ''
-        if self.uuid is not None:
-            uuid_str = ' - ' + self.uuid
-        return "/dev/%s (%d MB) [%s]%s%s" % (
+        return "/dev/%s (%d MB) [%s]%s" % (
             self.name,
             math.floor((self.size_bytes or 0) / units.MB),
             type_str,
             mount_str,
-            uuid_str,
         )
 
 
@@ -200,8 +185,7 @@ def disks():
 def _linux_disks():
     # In Linux, we could use the fdisk, lshw or blockdev commands to list disk
     # information, however all of these utilities require root privileges to
-    # run. We can get all of this information by examining the /sys/block
-    # filesystem and the udev database instead.
+    # run. We can get all of this information by examining the /sys/block sysfs
     res = []
     for filename in os.listdir(_LINUX_SYS_BLOCK_DIR):
         # Hard drives start with an 's' or an 'h' (for SCSI and IDE) followed
@@ -212,18 +196,46 @@ def _linux_disks():
         bus_type = 'SCSI' if filename[0] == 's' else 'IDE'
         size_bytes = _linux_disk_size_bytes(filename)
 
-        udev_path = _LINUX_SYS_CLASS_BLOCK_DIR + filename
-        d_info = udev.device_properties(udev_path)
-
         d = Disk(name=filename, bus_type=bus_type, size_bytes=size_bytes)
-        d.vendor = d_info.get('ID_VENDOR')
-        d.serial_no = d_info.get('ID_SERIAL')
+        d.vendor = _linux_disk_vendor(filename)
+        d.serial_no = _linux_disk_serial_number(filename)
 
         d.partitions = _linux_partitions_on_disk(d)
 
         res.append(d)
 
     return res
+
+
+def _linux_disk_serial_number(disk):
+    # Finding the serial number of a disk without root privileges in Linux is
+    # a little tricky. The /dev/disk/by-id directory contains a bunch of
+    # symbolic links to disk devices and partitions. The serial number is
+    # embedded as part of the symbolic link. For example, on my system, the
+    # primary SCSI disk (/dev/sda) is represented as a symbolic link named
+    # /dev/disk/by-id/scsi-3600508e000000000f8253aac9a1abd0c. The serial
+    # number is 3600508e000000000f8253aac9a1abd0c.
+    path = os.path.join(_LINUX_DEV_DISK_BY_ID)
+    for link in os.listdir(path):
+        lpath = os.path.join(_LINUX_DEV_DISK_BY_ID, link)
+        dest = os.readlink(lpath)
+        dest = os.path.basename(dest)
+        if dest != disk:
+            continue
+        parts = link.split("-")
+        return parts[1]
+    return "unknown"
+
+
+def _linux_disk_vendor(disk):
+    # In Linux, we can find the vendor for the block storage device (disk) by
+    # looking at /sys/block/$DEVICE/device/vendor file in sysfs
+    path = os.path.join(_LINUX_SYS_BLOCK_DIR, disk, "device", "vendor")
+    try:
+        contents = open(path, 'r').read()
+    except IOError:
+        return "unknown"
+    return contents.strip()
 
 
 def _linux_partitions_on_disk(disk):
@@ -234,17 +246,24 @@ def _linux_partitions_on_disk(disk):
         if not filename.startswith(dev_name):
             continue
 
-        udev_path = _LINUX_SYS_CLASS_BLOCK_DIR + filename
-        d_info = udev.device_properties(udev_path)
-
         p = Partition(disk, name=filename)
-        p.type = d_info.get('ID_FS_TYPE')
-        p.label = d_info.get('ID_FS_LABEL')
-        p.uuid = d_info.get('ID_FS_UUID')
+        p.type = _linux_partition_type(filename)
         p.mount_point = _linux_partition_mount_point(filename)
         p.size_bytes = _linux_partition_size_bytes(filename)
         res.append(p)
     return res
+
+
+def _linux_partition_type(part_name):
+    if not part_name.startswith('/dev'):
+        part_name = '/dev/' + part_name
+    cmd = ['findmnt', part_name, '--noheadings', '--output', 'FSTYPE']
+    try:
+        out = subprocess.check_output(cmd)
+        return out.strip()
+    except subprocess.CalledProcessError:
+        # Not mounted...
+        return None
 
 
 def _linux_partition_mount_point(part_name):

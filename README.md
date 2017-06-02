@@ -90,11 +90,11 @@ block (1 disk block devices, 1905440.0 MB total size)
 ...             print "  partition: " + str(p)
 ... 
 disk: /dev/sda (1905440 MB) [SCSI] LSI - SN #3600508e000000000f8253aac9a1abd0c
-  partition: /dev/sda6 (1699533 MB) [ext4] mounted@/ - f29a0c43-749b-4fea-b2bb-d120e896e702
-  partition: /dev/sda1 (100 MB) [ntfs] - E0A237E1A237BABC
-  partition: /dev/sda3 (449 MB) [ntfs] - 7026ADB926AD8128
-  partition: /dev/sda2 (190881 MB) [ntfs] - B00C39910C395416
-  partition: /dev/sda5 (14473 MB) [swap] - 7710167e-924b-4773-b1e6-906540d15b6d
+  partition: /dev/sda6 (1699533 MB) [ext4] mounted@/
+  partition: /dev/sda1 (100 MB) [ntfs]
+  partition: /dev/sda3 (449 MB) [ntfs]
+  partition: /dev/sda2 (190881 MB) [ntfs]
+  partition: /dev/sda5 (14473 MB) [swap]
   partition: /dev/sda4 (0 MB) [None]
 ```
 
@@ -357,8 +357,8 @@ request or bug report.
 
 ### Running tests
 
-You can run unit tests easily using the `tox -epy27` command, like so:
+You can run unit tests easily using the `tox` command, like so:
 
 ```bash
-$ tox -epy27
+$ tox
 ```
