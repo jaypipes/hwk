@@ -206,7 +206,6 @@ def info():
         return None
 
 
-@utils.memoize
 def _linux_info():
     nics = []
     for filename in os.listdir(_LINUX_SYS_CLASS_NET_DIR):

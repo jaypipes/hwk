@@ -19,7 +19,6 @@ import platform
 
 from hwk import udev
 from hwk import units
-from hwk import utils
 
 
 _SECTOR_SIZE = 512
@@ -308,7 +307,6 @@ def total_size_bytes():
     }[platform.system()]()
 
 
-@utils.memoize
 def _linux_total_size_bytes():
     return sum(d.size_bytes for d in _linux_disks())
 

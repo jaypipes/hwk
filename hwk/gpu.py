@@ -16,7 +16,6 @@ import subprocess
 import sys
 
 from hwk import udev
-from hwk import utils
 
 _LINUX_SYS_BUS_PCI_DEVICES_DIR = '/sys/bus/pci/devices/'
 _INFO_HELP = """GPU subsystem
@@ -108,7 +107,6 @@ def info():
         return None
 
 
-@utils.memoize
 def _linux_info():
     gpus = []
     cmd = ['lspci', '-D']
