@@ -199,7 +199,7 @@ falling back to setting the total physical amount of memory to the total usable
 amount of memory
 """
 
-        print(sys.stderr, msg)
+        print(msg, file=sys.stderr)
         tpb = tub
     res.total_physical_bytes = tpb
     res.total_usable_bytes = tub

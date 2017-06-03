@@ -161,10 +161,10 @@ class Partition(object):
     def __repr__(self):
         type_str = ''
         if self.type is not None:
-            type_str = " [" + self.type + "]"
+            type_str = " [" + six.text_type(self.type) + "]"
         mount_str = ''
         if self.mount_point is not None:
-            mount_str = ' mounted@' + self.mount_point
+            mount_str = ' mounted@' + six.text_type(self.mount_point)
         return "/dev/%s (%d MB) [%s]%s" % (
             self.name,
             math.floor((self.size_bytes or 0) / units.MB),
