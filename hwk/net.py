@@ -229,8 +229,16 @@ def _linux_info():
         if filename == 'lo':
             continue
 
-        udev_path = _LINUX_SYS_CLASS_NET_DIR + '/' + filename
-        d_info = udev.device_properties(udev_path)
+        net_path = os.path.join(_LINUX_SYS_CLASS_NET_DIR, filename)
+        dest = os.readlink(net_path)
+        if 'virtio' in dest:
+            # Don't bother using udevadm for virtual devices... we'll get an
+            # error "query needs a valid device specified by --path= or
+            # --name="
+            d_info = {}
+        else:
+            udev_path = _LINUX_SYS_CLASS_NET_DIR + '/' + filename
+            d_info = udev.device_properties(udev_path)
 
         nic = NIC(filename)
 

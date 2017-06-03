@@ -12,9 +12,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import os
 import subprocess
 
 import six
+
+if six.PY3:
+    DEVNULL = subprocess.DEVNULL
+else:
+    DEVNULL = open(os.devnull, 'w')
 
 
 def device_properties(path):
@@ -23,8 +29,7 @@ def device_properties(path):
     """
     cmd = ['udevadm', 'info', '-q', 'property', path]
     try:
-        print("Calling udevadm: %s" % " ".join(cmd))
-        out = subprocess.check_output(cmd)
+        out = subprocess.check_output(cmd, stderr=DEVNULL)
     except subprocess.CalledProcessError:
         return {}
 
