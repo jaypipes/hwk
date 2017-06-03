@@ -58,3 +58,9 @@ if __name__ == '__main__':
         print("  nics:")
     for n in i.nics:
         print("    %s" % n)
+        af, ef = net.nic_features(n.name)
+        if af:
+            print("    features:")
+            for f in af:
+                on = "* " if f in ef else "  "
+                print("    %s%s" % (on, f))

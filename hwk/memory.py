@@ -198,8 +198,8 @@ the current user may not have necessary privileges to read the syslog. We are
 falling back to setting the total physical amount of memory to the total usable
 amount of memory
 """
-
-        print(msg, file=sys.stderr)
+        sys.stderr.write(msg)
+        sys.stderr.flush()
         tpb = tub
     res.total_physical_bytes = tpb
     res.total_usable_bytes = tub

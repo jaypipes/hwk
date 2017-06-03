@@ -98,10 +98,10 @@ class NIC(object):
     def __repr__(self):
         vendor_str = ''
         if self.vendor is not None:
-            vendor_str = ' [' + self.vendor.strip() + ']'
+            vendor_str = ' [' + self.vendor.strip().decode('utf8') + ']'
         model_str = ''
         if self.model is not None:
-            model_str = ' - ' + self.model.strip()
+            model_str = ' - ' + self.model.strip().decode('utf8')
         return "NIC %s%s%s" % (
             self.name,
             vendor_str,
@@ -168,7 +168,8 @@ def _linux_nic_features(nic_name):
         all_features = set()
         enabled = set()
         for line in out.split(six.b('\n'))[1:]:
-            parts = six.text_type(line).split(':')
+            line = line.decode('utf8')
+            parts = line.split(':')
             if len(parts) != 2:
                 continue
             feature = parts[0].strip()

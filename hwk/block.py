@@ -17,6 +17,8 @@ import os
 import subprocess
 import platform
 
+import six
+
 from hwk import units
 
 
@@ -161,11 +163,11 @@ class Partition(object):
     def __repr__(self):
         type_str = ''
         if self.type is not None:
-            type_str = " [" + six.text_type(self.type) + "]"
+            type_str = " [" + self.type.decode('utf8') + "]"
         mount_str = ''
         if self.mount_point is not None:
-            mount_str = ' mounted@' + six.text_type(self.mount_point)
-        return "/dev/%s (%d MB) [%s]%s" % (
+            mount_str = ' mounted@' + self.mount_point.decode('utf8')
+        return "/dev/%s (%d MB) %s%s" % (
             self.name,
             math.floor((self.size_bytes or 0) / units.MB),
             type_str,
@@ -259,8 +261,8 @@ def _linux_partition_type(part_name):
         part_name = '/dev/' + part_name
     cmd = ['findmnt', part_name, '--noheadings', '--output', 'FSTYPE']
     try:
-        out = subprocess.check_output(cmd)
-        return out.strip()
+        out = subprocess.check_output(cmd).strip()
+        return out
     except subprocess.CalledProcessError:
         # Not mounted...
         return None
