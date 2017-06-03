@@ -27,8 +27,9 @@ class TestNet(base.TestCase):
             self.assertTrue(0 < len(nic.name))
 
     def test_nic_features(self):
-
         info = net.info()
+        nics = info.nics
+
         for nic in nics:
             all_f, enabled_f = net.nic_features(nic.name)
             self.assertTrue(0 < len(all_f))
