@@ -231,9 +231,7 @@ def _linux_info():
         udev_path = _LINUX_SYS_CLASS_NET_DIR + '/' + filename
         d_info = udev.device_properties(udev_path)
 
-        nic_name = d_info.get('ID_NET_NAME', d_info.get('ID_NET_NAME_PATH'))
-
-        nic = NIC(nic_name)
+        nic = NIC(filename)
 
         nic.mac = _linux_net_device_mac_address(filename)
         nic.vendor = d_info.get('ID_VENDOR_FROM_DATABASE')
