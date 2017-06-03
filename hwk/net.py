@@ -16,6 +16,8 @@ import os
 import subprocess
 import platform
 
+import six
+
 from hwk import udev
 
 
@@ -165,8 +167,8 @@ def _linux_nic_features(nic_name):
         # hw-tc-offload: off [fixed]
         all_features = set()
         enabled = set()
-        for line in out.split('\n')[1:]:
-            parts = line.split(':')
+        for line in out.split(six.b('\n'))[1:]:
+            parts = six.text_type(line).split(':')
             if len(parts) != 2:
                 continue
             feature = parts[0].strip()
@@ -233,13 +235,13 @@ def _linux_info():
 
         nic = NIC(nic_name)
 
-        nic.mac = _linux_net_device_mac_address(nic_name)
+        nic.mac = _linux_net_device_mac_address(filename)
         nic.vendor = d_info.get('ID_VENDOR_FROM_DATABASE')
         nic.vendor_id = d_info.get('ID_VENDOR_ID')
         nic.model = d_info.get('ID_MODEL_FROM_DATABASE')
         nic.bus_type = d_info.get('ID_BUS')
         nic.driver = d_info.get('ID_NET_DRIVER')
-        features = _linux_nic_features(nic_name)
+        features = _linux_nic_features(filename)
         if features is not None:
             nic.enabled_features = features[1]
         nics.append(nic)
