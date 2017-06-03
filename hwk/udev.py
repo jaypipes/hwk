@@ -23,6 +23,7 @@ def device_properties(path):
     """
     cmd = ['udevadm', 'info', '-q', 'property', path]
     try:
+        print("Calling udevadm: %s" % " ".join(cmd))
         out = subprocess.check_output(cmd)
     except subprocess.CalledProcessError:
         return {}

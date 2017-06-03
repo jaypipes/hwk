@@ -8,6 +8,7 @@ install:
 script:
     - tox
     - python inspect_host.py
+    - udevadm info -1 property /sys/class/net/eth0
 # Using sudo triggers a real virtual machine as opposed to a container, which
 # allows ghw to actually determine things like host memory or block storage...
 sudo: required

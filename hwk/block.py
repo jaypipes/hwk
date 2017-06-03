@@ -17,8 +17,6 @@ import os
 import subprocess
 import platform
 
-import six
-
 from hwk import units
 
 
