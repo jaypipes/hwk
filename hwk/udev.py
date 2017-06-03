@@ -22,7 +22,10 @@ def device_properties(path):
     properties for the device.
     """
     cmd = ['udevadm', 'info', '-q', 'property', path]
-    out = subprocess.check_output(cmd)
+    try:
+        out = subprocess.check_output(cmd)
+    except subprocess.CalledProcessError:
+        return {}
 
     # Output from udevadm info looks like the following:
     # $ udevadm info -q property /sys/class/block/sda
