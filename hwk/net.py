@@ -14,7 +14,7 @@
 
 import os
 import subprocess
-import sys
+import platform
 
 from hwk import udev
 
@@ -185,11 +185,28 @@ def nic_features(nic_name):
     first set are all the features, the second are all features that are
     enabled.
     """
+    return {
+        "Linux": _linux_nic_features,
+    }[platform.system()](nic_name)
+
+
+def _linux_net_device_mac_address(dev):
+    # Instead of use udevadm, we can get the device's MAC address by examing
+    # the /sys/class/net/$DEVICE/address file in sysfs. However, for devices
+    # that have addr_assign_type != 0, return None since the MAC address is
+    # random.
     try:
-        return {
-            "linux2": _linux_nic_features,
-        }[sys.platform](nic_name)
-    except KeyError:
+        aat_path = os.path.join(
+            _LINUX_SYS_CLASS_NET_DIR,
+            dev,
+            'addr_assign_type',
+        )
+        aat = int(open(aat_path, 'r').read().strip())
+        if aat != 0:
+            return None
+        addr_path = os.path.join(_LINUX_SYS_CLASS_NET_DIR, dev, 'address')
+        return open(addr_path, 'r').read().strip()
+    except IOError:
         return None
 
 
@@ -197,12 +214,9 @@ def info():
     """Returns a `hwk.net.Info` object containing information on the network
     subsystem, or None if the information could not be determined.
     """
-    try:
-        return {
-            "linux2": _linux_info,
-        }[sys.platform]()
-    except KeyError:
-        return None
+    return {
+        "Linux": _linux_info,
+    }[platform.system()]()
 
 
 def _linux_info():
@@ -219,17 +233,7 @@ def _linux_info():
 
         nic = NIC(nic_name)
 
-        mac = d_info.get('ID_NET_NAME_MAC')
-        if mac is not None:
-            # udev reports MAC addresses for network controllers in the form
-            # "{type}x[a-f0-9]12", where {type} is a two-letter code for the
-            # type of device. For example, here is what udev reports for an
-            # ethernet and a wireless network controller:
-            #
-            # ID_NET_NAME_MAC=enxe06995034837
-            # ID_NET_NAME_MAC=wlx1c7ee5299a06
-            nic.mac = mac[-12:]
-
+        nic.mac = _linux_net_device_mac_address(nic_name)
         nic.vendor = d_info.get('ID_VENDOR_FROM_DATABASE')
         nic.vendor_id = d_info.get('ID_VENDOR_ID')
         nic.model = d_info.get('ID_MODEL_FROM_DATABASE')
